@@ -80,7 +80,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'djschoology.core',
-    'djsapo.dashboard',
     # needed for template tags
     'djtools',
 ]
