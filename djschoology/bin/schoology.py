@@ -6,6 +6,7 @@ import time
 import argparse
 import shutil
 import datetime
+import smtplib
 
 # python path
 sys.path.append('/usr/lib/python2.7/dist-packages/')
@@ -25,6 +26,7 @@ django.setup()
 # django settings for script
 from django.conf import settings
 from djimix.core.utils import get_connection, xsql
+# from djtools.utils.mail import send_mail
 
 # informix environment
 os.environ['INFORMIXSERVER'] = settings.INFORMIXSERVER
@@ -38,7 +40,7 @@ os.environ['LD_RUN_PATH'] = settings.LD_RUN_PATH
 
 from djschoology.sql.schoology import COURSES, USERS, ENROLLMENT, CROSSLIST, \
     CANCELLED_COURSES
-# from djequis.core.utils import sendmail
+from djschoology.core.utilities import fn_send_mail
 
 
 DEBUG = settings.INFORMIX_DEBUG
@@ -59,6 +61,7 @@ parser.add_argument(
     help="database name.",
     dest="database"
 )
+
 
 def file_upload():
     """by adding cnopts, I'm authorizing the program to ignore the host key
@@ -98,10 +101,10 @@ def file_upload():
         SUBJECT = 'SCHOOLOGY UPLOAD failed'
         BODY = 'Unable to PUT .csv files to Schoology ' \
                'server.\n\n{0}'.format(repr(e))
-        # sendmail(
-        #     settings.SCHOOLOGY_TO_EMAIL,settings.SCHOOLOGY_FROM_EMAIL,
-        #     BODY, SUBJECT
-        # )
+        fn_send_mail(
+            settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
+            BODY, SUBJECT
+        )
 
 def main():
     """
@@ -138,7 +141,6 @@ def main():
             ).fetchall()
         resultrow = list(data_result)
 
-
         # if the resultrow qry returns a row then we will create the courses
         # cancelled list
         if resultrow is not None:
@@ -160,10 +162,10 @@ def main():
             SUBJECT = 'SCHOOLOGY - Cancelled Courses'
             BODY = 'The following courses have been ' \
                    'cancelled.\n\n{0}'.format(courses_table)
-            # sendmail(
-            #     settings.SCHOOLOGY_MSG_EMAIL,settings.SCHOOLOGY_FROM_EMAIL,
-            #     BODY, SUBJECT
-            # )
+            fn_send_mail(
+                settings.SCHOOLOGY_MSG_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
+                BODY, SUBJECT
+            )
         else:
             pass
             # print('Do nothing!')
@@ -172,7 +174,8 @@ def main():
         # print('Do nothing!')
 
     # set dictionary
-    sql_dict = {'USERS': USERS}
+    sql_dict = {'CROSSLIST': CROSSLIST
+        }
     # sql_dict = {
     #     'COURSES': COURSES,
     #     'USERS': USERS,
@@ -244,15 +247,15 @@ def main():
                     ])
             if key == 'ENROLLMENT':
                 pass
-                # output.writerow([
-                #     "Course Code", "Section Code", "Section School Code",
-                #     "Unique ID", "Enrollment Type", "Grade Period"
-                #     ])
+                output.writerow([
+                    "Course Code", "Section Code", "Section School Code",
+                    "Unique ID", "Enrollment Type", "Grade Period"
+                    ])
             if key == 'CROSSLIST':
                 pass
-                # output.writerow([
-                #     "Meeting Number", "Cross-listed Section Code",
-                #     "Target Code"])
+                output.writerow([
+                    "Meeting Number", "Cross-listed Section Code",
+                    "Target Code"])
 
             """ WRITE THE DATA """
             for row in rows:
@@ -272,25 +275,23 @@ def main():
 
                 if key == 'ENROLLMENT': # write data row for ENROLLMENT
                     pass
-                    # output.writerow([
-                    #     row["coursecode"], row["sectioncode"],
-                    #     row["secschoolcode"],
-                    #     ("{0:.0f}".format(0 if row['uniqueuserid'] is None
-                    #                       else row['uniqueuserid'])),
-                    #     row["enrollmenttype"], row["gradeperiod"]
-                    #     ])
+                    output.writerow([
+                        row[0], row[1], row[2],
+                        ("{0:.0f}".format(0 if row[3] is None
+                                          else row[3])),
+                        row[4], row[5]
+                        ])
                 if key == 'CROSSLIST': # write data row for CROSSLIST
-                    pass
-                    # output.writerow([
-                    #     row["mtg_no"], row["crls_code"], row["targ_code"]
-                    #     ])
+                    output.writerow([
+                        row[0], row[1], row[2]
+                        ])
         else:
            SUBJECT = 'SCHOOLOGY UPLOAD failed'
            BODY = 'No values in list.'
-           # sendmail(
-           #     settings.SCHOOLOGY_TO_EMAIL,settings.SCHOOLOGY_FROM_EMAIL,
-           #     BODY, SUBJECT
-           # )
+           fn_send_mail(
+               settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
+               BODY, SUBJECT
+           )
         csvfile.close()
         # renaming old filename to newfilename and move to archive location
         shutil.copy(filename, archive_destination)
