@@ -1,12 +1,12 @@
 import os
 import sys
-import pysftp
 import csv
 import time
 import argparse
 import shutil
 import datetime
 import smtplib
+import pysftp
 
 # python path
 sys.path.append('/usr/lib/python2.7/dist-packages/')
@@ -63,7 +63,7 @@ parser.add_argument(
 )
 
 
-def file_upload():
+def fn_file_upload():
     """by adding cnopts, I'm authorizing the program to ignore the host key
       and just continue"""
     cnopts = pysftp.CnOpts()
@@ -98,13 +98,15 @@ def file_upload():
             # close sftp connection
             sftp.close()
     except Exception as e:
-        SUBJECT = 'SCHOOLOGY UPLOAD failed'
-        BODY = 'Unable to PUT .csv files to Schoology ' \
-               'server.\n\n{0}'.format(repr(e))
-        fn_send_mail(
-            settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
-            BODY, SUBJECT
-        )
+        print('Unable to PUT .csv files to Schoology ' + repr(e))
+
+        # SUBJECT = 'SCHOOLOGY UPLOAD failed'
+        # BODY = 'Unable to PUT .csv files to Schoology ' \
+        #        'server.\n\n{0}'.format(repr(e))
+        # fn_send_mail(
+        #     settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
+        #     BODY, SUBJECT
+        # )
 
 def main():
     """
@@ -130,9 +132,9 @@ def main():
     # getting date and time string
     dt = datetime.datetime.now()
     # if it's after 12 PM then we will email if there any cancelled courses
+    # to test use < 12  otherwise use >
     if dt.hour > 12:
-        # check to see if there are any cancelled courses 
-
+        # check to see if there are any cancelled courses
         connection = get_connection(EARL)
         with connection:
             data_result = xsql(
@@ -174,14 +176,14 @@ def main():
         # print('Do nothing!')
 
     # set dictionary
-    sql_dict = {'CROSSLIST': CROSSLIST
-        }
-    # sql_dict = {
-    #     'COURSES': COURSES,
-    #     'USERS': USERS,
-    #     'ENROLLMENT': ENROLLMENT,
-    #     'CROSSLIST': CROSSLIST
+    # sql_dict = {'CROSSLIST': CROSSLIST
     #     }
+    sql_dict = {
+        'COURSES': COURSES,
+        'USERS': USERS,
+        'ENROLLMENT': ENROLLMENT,
+        'CROSSLIST': CROSSLIST
+        }
     for key, value in sql_dict.items():
         if test:
             print(key)
@@ -272,7 +274,6 @@ def main():
                         row[5], row[6], row[7], row[8], row[9],
                         row[10], row[11], row[12], row[13], row[14], row[15]
                         ])
-
                 if key == 'ENROLLMENT': # write data row for ENROLLMENT
                     pass
                     output.writerow([
@@ -296,7 +297,8 @@ def main():
         # renaming old filename to newfilename and move to archive location
         shutil.copy(filename, archive_destination)
     if not test:
-        file_upload()
+        print("Send to ftp server")
+        # fn_file_upload()
 
 
 if __name__ == "__main__":
