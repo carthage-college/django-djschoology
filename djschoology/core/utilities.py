@@ -1,11 +1,9 @@
 import smtplib
 from logging.handlers import SMTPHandler
-
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email import encoders
-
 
 
 def fn_send_mail(to, frum, body, subject):
@@ -13,8 +11,6 @@ def fn_send_mail(to, frum, body, subject):
     Stock sendmail in core does not have reply to or split of to emails
     --email to addresses may come as list
     """
-
-    print(to.split(','))
 
     server = smtplib.SMTP('localhost')
 
@@ -25,10 +21,6 @@ def fn_send_mail(to, frum, body, subject):
         msg['Subject'] = subject
         txt = msg.as_string()
 
-        # print("ready to send")
-        # show communication with the server
-        # if debug:
-        #     server.set_debuglevel(True)
         # print(msg['To'])
         # print(msg['From'])
         server.sendmail(frum, to.split(','), txt)
@@ -43,3 +35,4 @@ def fn_send_mail(to, frum, body, subject):
         server.quit()
         # print("Done")
         pass
+
