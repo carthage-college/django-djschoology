@@ -42,7 +42,6 @@ from djschoology.sql.schoology import COURSES, USERS, ENROLLMENT, CROSSLIST, \
     CANCELLED_COURSES
 from djschoology.core.utilities import fn_send_mail
 
-
 DEBUG = settings.INFORMIX_DEBUG
 
 desc = """
@@ -298,7 +297,7 @@ def main():
         shutil.copy(filename, archive_destination)
     if not test:
         print("Send to ftp server")
-        # fn_file_upload()
+        fn_file_upload()
 
 
 if __name__ == "__main__":
