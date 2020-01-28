@@ -97,15 +97,15 @@ def fn_file_upload():
             # close sftp connection
             sftp.close()
     except Exception as e:
-        print('Unable to PUT .csv files to Schoology ' + repr(e))
+        # print('Unable to PUT .csv files to Schoology ' + repr(e))
 
-        # SUBJECT = 'SCHOOLOGY UPLOAD failed'
-        # BODY = 'Unable to PUT .csv files to Schoology ' \
-        #        'server.\n\n{0}'.format(repr(e))
-        # fn_send_mail(
-        #     settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
-        #     BODY, SUBJECT
-        # )
+        SUBJECT = 'SCHOOLOGY UPLOAD failed'
+        BODY = 'Unable to PUT .csv files to Schoology ' \
+               'server.\n\n{0}'.format(repr(e))
+        fn_send_mail(
+            settings.SCHOOLOGY_TO_EMAIL, settings.SCHOOLOGY_FROM_EMAIL,
+            BODY, SUBJECT
+        )
 
 def main():
     """
@@ -130,8 +130,12 @@ def main():
     datetimestr = time.strftime("%Y%m%d%H%M%S")
     # getting date and time string
     dt = datetime.datetime.now()
-    # if it's after 12 PM then we will email if there any cancelled courses
-    # to test use < 12  otherwise use >
+
+    """CANCELLED COURSES
+        if it's after 12 PM then we will email if there any cancelled courses
+        to test use < 12  otherwise use >
+    """
+
     if dt.hour > 12:
         # check to see if there are any cancelled courses
         connection = get_connection(EARL)
@@ -184,8 +188,8 @@ def main():
         'CROSSLIST': CROSSLIST
         }
     for key, value in sql_dict.items():
-        if test:
-            print(key)
+        # if test:
+        #     print(key)
         """###################################################################
         Dict Value 'COURSES and SECTIONS' return all courses and sections 
         with a start date less than six months from the current date.
@@ -208,7 +212,7 @@ def main():
         for a program it looks six months ahead
         ######################################################################
         """
-        print("Start Query")
+        # print("Start Query")
         connection = get_connection(EARL)
         with connection:
             data_result = xsql(
@@ -216,7 +220,7 @@ def main():
                 key=settings.INFORMIX_DEBUG
             ).fetchall()
         rows = list(data_result)
-        print("Query finished")
+        # print("Query finished")
 
         # set directory and filename to be stored
         # ex. /data2/www/data/schoology/COURSES.csv
@@ -296,7 +300,7 @@ def main():
         # renaming old filename to newfilename and move to archive location
         shutil.copy(filename, archive_destination)
     if not test:
-        print("Send to ftp server")
+        # print("Send to ftp server")
         fn_file_upload()
 
 
