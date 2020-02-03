@@ -8,14 +8,6 @@ import datetime
 import smtplib
 import pysftp
 
-# python path
-sys.path.append('/usr/lib/python2.7/dist-packages/')
-sys.path.append('/usr/lib/python2.7/')
-sys.path.append('/usr/local/lib/python2.7/dist-packages/')
-sys.path.append('/data2/django_1.11/')
-sys.path.append('/data2/django_projects/')
-sys.path.append('/data2/django_third/')
-
 # prime django
 import django
 
@@ -308,7 +300,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     test = args.test
     database = args.database
-    
+
     if not database:
         print("mandatory option missing: database name\n")
         parser.print_help()
