@@ -164,7 +164,7 @@ FROM
 	   trim(IR.firstname) firstname, trim(ADR.alt_name) preferred_first_name,
 	    trim(IR.middlename) middlename, trim(IR.lastname) lastname, 
 	    trim(JPR.host_username) username, TRIM(JPR.e_mail) EMAIL,
-	    to_number(JPR.host_id) UniqueID,
+	    trim(JPR.host_id) UniqueID,
 	    CASE WHEN title1.hrpay NOT IN ('VEN', 'DPW', 'BIW', 'FV2', 'SUM', 'GRD')
 	        OR TLE.tle = 'Y'
 	        THEN 'FAC' ELSE 'STU' END AS ROLE,
