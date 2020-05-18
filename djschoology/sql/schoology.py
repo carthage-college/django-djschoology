@@ -221,11 +221,7 @@ FROM
 	       AND ADR.style = 'N' 
 	WHERE status_code not in ('PGR', 'ALM',  'PTR')
 	       AND	JC.host_id NOT IN 
-		   (
-		    SELECT ID FROM role_rec
-			WHERE role = 'PREFF' AND end_date IS NULL 
-			AND MONTH(TODAY) IN (6,7)
-	    	)  
+          (SELECT ID FROM cc_incoming_students_vw)  
 	)
 WHERE row_num = 1
 ORDER BY lastname ASC, firstname ASC, role ASC;
@@ -264,11 +260,8 @@ ENROLLMENT = '''
         jenztrm_rec.end_date >= ADD_MONTHS(today,-1)
     AND
     RIGHT(TRIM(jenzcrp_rec.term_code),4) NOT IN ('PRDV','PARA','KUSD')
-	AND to_number(jenzcrp_rec.host_id) NOT IN 
-	(select ID from role_rec
-	where role = 'PREFF' and end_date is null
-	and MONTH(TODAY) IN (6,7)
-   )
+    AND to_number(jenzcrp_rec.host_id) NOT IN 
+    (SELECT ID FROM cc_incoming_students_vw )
 
     UNION ALL
 
@@ -279,7 +272,7 @@ ENROLLMENT = '''
         sr.fac_id uniqueuserid,
         '1PR' enrollmenttype,
         TRIM(sr.sess)||' '||sr.yr||' '||TRIM(cr.prog) gradeperiod,
-        sr.beg_date startdate, 'Closed'
+        sr.beg_date startdate, 'Closed' 
     FROM
         sec_rec sr
     JOIN 
