@@ -173,9 +173,9 @@ FROM
 	    CASE NVL(title1.job_title,'x') WHEN 'x' THEN '' 
 			ELSE trim(title1.job_title) END||
 	    CASE NVL(title2.job_title,'x') WHEN 'x' THEN '' 
-	   		ELSE '; '||trim(title2.job_title) END||
+	   		ELSE '; '||title2.job_title END||
 	    CASE NVL(title3.job_title,'x') WHEN 'x' THEN '' 
-	   		ELSE '; '||trim(title3.job_title) END
+	   		ELSE '; '||title3.job_title END
 	    Position, 
 	    row_number() OVER 
 	    (partition BY JC.host_id
