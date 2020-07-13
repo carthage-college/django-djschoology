@@ -293,7 +293,7 @@ def main():
         # renaming old filename to newfilename and move to archive location
         shutil.copy(filename, archive_destination)
     if not test:
-        # print("Send to ftp server")
+        print("Send to ftp server")
         fn_file_upload()
 
 
